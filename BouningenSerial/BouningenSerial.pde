@@ -26,8 +26,6 @@ int id;
 MultiMarker pat;//全体座標のマーカー
 int patid;
 
-boolean serialRead=true;//シリアル通信用通信開始フラグ
-
 void setup(){
   size(640,480,P3D);
   sphereDetail(10);
@@ -39,7 +37,7 @@ void setup(){
   //id=nya.addNyIdMarker(7,30);
   
   String portName = Serial.list()[0];
-  myPort = new Serial(this, "COM13", 9600);
+  myPort = new Serial(this, "COM5", 9600);
   myPort.write(0);              // send an L otherwise
   myPort.write(0);              // send an L otherwise
   myPort.write(0);              // send an L otherwise
@@ -83,7 +81,10 @@ void draw(){
     }
   }
   updatePixels();                   // pixelsのデータを画面に反映
-  if(serialRead) serial();//シリアル系の処理はここで行う
+  if(myPort.available()>0){
+    int a=myPort.read();
+    serial();//シリアル系の処理はここで行う
+  }
 }
 
 void ObjectSetting(){
@@ -153,7 +154,7 @@ void cont(){
   }
 }
 
-
+/*
 void mouseWheel(int delta) {
   if(p.getActiontime()==0){
     p.update();
@@ -184,7 +185,7 @@ void mouseWheel(int delta) {
   }
   
 }
-
+*/
 
 void mousePressed() {
   if ((mouseButton == LEFT)&&(p.getJumptime()==0)&&(p.getActiontime()==0)) {
@@ -229,12 +230,5 @@ void serial(){
   myPort.write(b);
   if(p.getType()==4&&ARBox.servoNear(p)) myPort.write(movetime);
   else myPort.write(0);
-  serialRead=false;
 }
 
-void serialEvent(Serial p){
-  if(myPort.available()>0){
-    int a=myPort.read();
-    serialRead=true;
-  }
-}
